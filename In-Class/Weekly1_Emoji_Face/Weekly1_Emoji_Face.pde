@@ -1,5 +1,7 @@
 size(600,600);
 
+background(#FF8324);
+
 int x = 0;
 int y = 0;
 int smallSide;
