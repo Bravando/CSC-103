@@ -1,20 +1,27 @@
 size(800,600);
+background(#286F9D);
 rectMode(CENTER);
 
-
+stroke(#FF6FD6);
 // Important Changable Variables
 
 int houseXPlace = width/2;
 int houseYPlace = height/2;
-int houseWidth = 100;
-int houseHeight = 100;
-int roofHeight = 50;
+int houseWidth = 300;
+int houseHeight = 300;
+int roofHeight = 100;
 float doorSize = 0.5;
-boolean roofHangover;
+boolean roofHangover = false;
 
 // Dependant Variables
 
 int hangover = 0;
+
+roofHangover = true;
+
+if(roofHangover == true){hangover = houseWidth/10;}
+else{hangover = 0;}
+
 int roofX1Place = houseXPlace-(houseWidth/2)-hangover;
 int roofY1Place = houseYPlace-(houseHeight/2);
 int roofX2Place = houseXPlace;
@@ -33,24 +40,22 @@ float doorHandleXPlace = doorXPlace + (doorWidth/3);
 float doorHandleYPlace = doorYPlace;
 
 
-
-
-
-roofHangover = true;
-
-
+                                      //House
+fill(#86CFFF);
 rect(houseXPlace,houseYPlace,houseWidth,houseHeight);
 
                                       //Roof
-  
-  triangle(roofX1Place, roofY1Place,
-           roofX2Place, roofY2Place,
-           roofX3Place, roofY3Place);
+fill(#E0C378);
+triangle(roofX1Place, roofY1Place,
+         roofX2Place, roofY2Place,
+         roofX3Place, roofY3Place);
          
                                       //Door
-  rect(doorXPlace, doorYPlace,
-       doorWidth, doorHeight);
+fill(#A57328);
+rect(doorXPlace, doorYPlace,
+     doorWidth, doorHeight);
                                       //Door Handle
-  circle(doorHandleXPlace, doorHandleYPlace,
-         doorHandleDiameter);
+fill(#F0E91B);
+circle(doorHandleXPlace, doorHandleYPlace,
+       doorHandleDiameter);
   
