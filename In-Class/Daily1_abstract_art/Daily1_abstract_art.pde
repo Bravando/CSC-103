@@ -64,10 +64,10 @@ void draw() {
   square2.move(square2);
   triangle1.move(triangle1);
   triangle2.move(triangle2);
-  circle1.bounceatbounds(circle1);
-  circle2.bounceatbounds(circle2);
-  square1.bounceatbounds(square1);
-  square2.bounceatbounds(square2);
+  circle1.bounceatbounds();
+  circle2.bounceatbounds();
+  square1.bounceatbounds();
+  square2.bounceatbounds();
   triangle1.tribounceatbounds(triangle1);
   triangle2.tribounceatbounds(triangle2);
 }
