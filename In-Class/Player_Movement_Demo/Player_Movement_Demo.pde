@@ -38,15 +38,19 @@ void keyReleased() {
 void movePlayer() {
   if (isUp) {
     pY -= pSpeed;
+    player.y -= pSpeed;
   }
   if (isDown) {
     pY += pSpeed;
+    player.y += pSpeed;
   }
   if (isLeft) {
     pX -= pSpeed;
+    player.x -= pSpeed;
   }
   if (isRight) {
     pX += pSpeed;
+    player.x += pSpeed;
   }
 }
 void changeMovement() {
