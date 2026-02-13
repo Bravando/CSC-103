@@ -55,33 +55,25 @@ void movePlayer() {
 }
 void changeMovement() {
   if (key == 'w') {
-    //player = PVector(player.x, player.y-pSpeed);
     isUp = !isUp;
   } else if (key == 's') {
-    //player.y += pSpeed;
     isDown = !isDown;
   }
   if (key == 'a') {
-    //player.x -= pSpeed;
     isLeft = !isLeft;
   } else if (key == 'd') {
-    //player.x += pSpeed;
     isRight = !isRight;
   }
 }
 void startMovement() {
   if (key == 'w') {
-    //player = PVector(player.x, player.y-pSpeed);
     isUp = true;
   } else if (key == 's') {
-    //player.y += pSpeed;
     isDown = true;
   }
   if (key == 'a') {
-    //player.x -= pSpeed;
     isLeft = true;
   } else if (key == 'd') {
-    //player.x += pSpeed;
     isRight = true;
   }
     if (key == CODED) {
@@ -99,17 +91,13 @@ void startMovement() {
 }
 void stopMovement() {
   if (key == 'w') {
-    //player = PVector(player.x, player.y-pSpeed);
     isUp = false;
   } else if (key == 's') {
-    //player.y += pSpeed;
     isDown = false;
   }
   if (key == 'a') {
-    //player.x -= pSpeed;
     isLeft = false;
   } else if (key == 'd') {
-    //player.x += pSpeed;
     isRight = false;
   }
   if (key == CODED) {
