@@ -18,15 +18,28 @@ PVector c3;
 float cD3;
 color cC3;
 
+color rando;
+
 float pSpeed;
 boolean isUp = false;
 boolean isDown = false;
 boolean isLeft = false;
 boolean isRight = false;
 
+PVector enemySpawn;
+float enemySize;
+float enemySpeed;
+int initialSpawnRate;
+int spawnRate;
+
+ArrayList<PVector> enemyPosns;
+ArrayList<Integer> enemyReds;
+ArrayList<Integer> enemyBlues;
+ArrayList<Integer> enemyGreens;
+
 
 void setup() {
-  size(800, 600);
+  size(800, 600, P2D);
   rectMode(CENTER);
   sPosn = new PVector(width/2, height/2);
   sSide = height/6;
@@ -35,7 +48,7 @@ void setup() {
   sTop = sPosn.y-sSide;
   sBottom = sPosn.y+sSide;
   leniency = 3;
-  
+
   c1 = new PVector(width/6, height/5);
   cD1 = height*.3;
   cC1 = color(255, 100, 0);
@@ -45,14 +58,16 @@ void setup() {
   c3 = new PVector(width/1.1, height/4);
   cD3 = width*.1;
   cC3 = color(0, 100, 255);
-  
+
   pSpeed = 4;
 }
 
 void draw() {
   background(bkg);
   sC = color(0, 255, 0);
-  
+  stroke(0);
+  strokeWeight(3);
+
   movePlayer();
 
   makeCircle(c1.x, c1.y, cD1, cC1);
@@ -67,6 +82,9 @@ void draw() {
 
   makeSquare(sPosn.x, sPosn.y, sSide, sC);
   //sPosn.x += 1;
+  //if(mousePressed){
+  //  deathAnimation(sPosn,sSide,50,sC);
+  //}
 }
 
 
@@ -186,16 +204,72 @@ void keyReleased() {
 }
 
 void movePlayer() {
+  float pRadius = sSide/2;
   if (isUp) {
-    sPosn.y -= pSpeed;
+    sPosn.y = constrain(sPosn.y-pSpeed, pRadius, height-pRadius);
   }
   if (isDown) {
-    sPosn.y += pSpeed;
+    sPosn.y = constrain(sPosn.y+pSpeed, pRadius, height-pRadius);
   }
   if (isLeft) {
-    sPosn.x -= pSpeed;
+    sPosn.x = constrain(sPosn.x-pSpeed, pRadius, width-pRadius);
   }
   if (isRight) {
-    sPosn.x += pSpeed;
+    sPosn.x = constrain(sPosn.x+pSpeed, pRadius, width-pRadius);
+  }
+}
+
+//void deathAnimation(PVector spot,float size,float lLength,color c){
+//  for(int i = 0; i < 6000; i++){
+//    float lStart = size*0.1+i/100;
+//    float hyToSide = 1/sqrt(2);
+//    stroke(c);
+//    strokeWeight(size/5);
+//    line(spot.x,spot.y+lStart,spot.x,spot.y+lStart+lLength);//down
+//    line(spot.x+lStart,spot.y,spot.x+lStart+lLength,spot.y);//right
+//    line(spot.x,spot.y-lStart,spot.x,spot.y-lStart-lLength);//up
+//    line(spot.x-lStart,spot.y,spot.x-lStart-lLength,spot.y);//left
+//    line((spot.x+lStart)*hyToSide,(spot.y+lStart)*hyToSide,(spot.x+lStart+lLength)*hyToSide,(spot.y+lStart+lLength)*hyToSide);//down-right
+//    line((spot.x+lStart)*hyToSide,(spot.y-lStart)*hyToSide,(spot.x+lStart+lLength)*hyToSide,(spot.y-lStart-lLength)*hyToSide);//up-right
+//    line((spot.x-lStart)*hyToSide,(spot.y+lStart)*hyToSide,(spot.x-lStart-lLength)*hyToSide,(spot.y+lStart+lLength)*hyToSide);//down-left
+//    line((spot.x-lStart)*hyToSide,(spot.y-lStart)*hyToSide,(spot.x-lStart-lLength)*hyToSide,(spot.y-lStart-lLength)*hyToSide);//up-left
+//  }
+//}
+void drawEnemies(ArrayList<PVector> posns, ArrayList<Integer> reds, ArrayList<Integer> blues, ArrayList<Integer> greens, float enemySize) {
+  for (PVector posn : posns) {
+    fill(reds[i], blues[i], greens[i]);
+    triangle(posn.x-enemySize, posn.y+enemySize, posn.x, posn.y-enemySize, posn.x+enemySize, posn.y+enemySize);
+  }
+}
+
+void hitByEnemy(ArrayList<PVector> enemies, float enemySize, PVector player, float playerSize) {
+  for (PVector enemy : enemies) {
+    squareHitSquare((player.x-playerSize/2),(player.x+playerSize/2),(player.y-playerSize/2), (player.y+playerSize/2), (enemy.x-enemySize/2), (enemy.x+enemySize/2), (enemy.y-enemySize/2), (enemy.y+enemySize/2));
+  }
+}
+
+color randomOf3Colors(color c0, color c1, color c2) {
+  rando = int(random(3));
+  if (rando == 0) {
+    return c0;
+  } else if (rando == 1) {
+    return c1;
+  } else if (rando == 2) {
+    return c2;
+  }
+}
+
+void makeEnemy(ArrayList<PVector> posns, ArrayList<Integer> reds, ArrayList<Integer> blues, ArrayList<Integer> greens, PVector enemySpawn, color c1, color c2, color c3) {
+  color eC = randomOf3Colors(c1, c2, c3);
+  posns.add(enemySpawn);
+  reds.add(int(red(eC)));
+  blues.add(int(blue(eC)));
+  greens.add(int(green(eC)));
+}
+
+void spawnEnemy(ArrayList<PVector> posns, ArrayList<Integer> reds, ArrayList<Integer> blues, ArrayList<Integer> greens, PVector enemySpawn, color c1, color c2, color c3, int spawnRate) {
+  for (int i = 0; i == spawnRate; i++) {
+    makeEnemy(posns, reds, blues, greens, enemySpawn, c1, c2, c3);
+    i=0;
   }
 }
