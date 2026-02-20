@@ -36,9 +36,6 @@ int spawnRateTicks;
 int spawnRate;
 
 ArrayList<PVector> enemyPosns;
-//ArrayList<Integer> enemyReds;
-//ArrayList<Integer> enemyBlues;
-//ArrayList<Integer> enemyGreens;
 ArrayList<Integer> enemyColors;
 
 
@@ -72,9 +69,6 @@ void setup() {
   enemySpawn = new PVector(0, height);
   enemySpeed = pSpeed-1;
   enemyPosns = new ArrayList<PVector>();
-  //enemyReds = new ArrayList<Integer>();
-  //enemyBlues = new ArrayList<Integer>();
-  //enemyGreens = new ArrayList<Integer>();
   enemyColors = new ArrayList<Integer>();
   spawnRateTicks = 0;
   spawnRate = 300;
@@ -86,7 +80,7 @@ void draw() {
   stroke(0);
   strokeWeight(3);
 
-//println(enemyPosns);
+//println(enemyPosns);                                                      // test
 
 
   drawEnemies(enemyPosns, enemyColors, enemySize,cC1, cC2, cC3);
@@ -123,7 +117,7 @@ void draw() {
     text("Change your color to kill the enemies!", width/4, height/2.3);
     openingTextTimerCounter++;
   }
-  //if (openingTextTimerCounter == openingTextTimer-1) {
+  //if (openingTextTimerCounter == openingTextTimer-1) {                // for testing purposes
   //  makeEnemy(enemyPosns, enemyColors, enemySpawn);
   //}
 
@@ -161,6 +155,9 @@ boolean squareHitSquare(float l1, float r1, float t1, float b1, float l2, float 
 }
 
 boolean octogonHitSquare(float x, float y, float octoRadius, float squareLeft, float squareRight, float squareTop, float squareBottom, float leniency) {
+  /*
+  checks if the 8 equadistant points from the given x and y enter the rectangle boundaries
+  */
   float hitRadius = octoRadius+leniency;
   return (inBounds(x-hitRadius, y, squareLeft, squareRight, squareTop, squareBottom) ||
     inBounds(x+hitRadius, y, squareLeft, squareRight, squareTop, squareBottom) ||
@@ -190,7 +187,7 @@ boolean inSquareCentered(float x, float y, float side, float inputX, float input
 boolean inDistance(float centerX, float centerY, float checkedX, float checkedY, float distance) {
   /*
   Checks if a given point is within a given distance of another point
-   */
+  */
   return distance >= dist(centerX, centerY, checkedX, checkedY);
 }
 void startMovement() {
@@ -284,6 +281,9 @@ void movePlayer() {
 
 
 void drawEnemies(ArrayList<PVector> enemies, ArrayList<Integer> colors, float enemySize, color c1, color c2, color c3) {
+  /*
+  draws enemies at the posns in the given arraylist
+  */
   for (int i = 0; i < enemies.size(); i++) {
     fill(chooseColor(colors.get(i),c1,c2,c3));
     triangle(enemies.get(i).x-enemySize, enemies.get(i).y+enemySize, enemies.get(i).x,
@@ -312,13 +312,10 @@ color chooseColor(int index, color c0, color c1, color c2) {
   }
 }
 
-void makeEnemy(ArrayList<PVector> enemies, ArrayList<Integer> colors, PVector enemySpawn) {
-  //color eC = randomOf3Colors(c1, c2, c3);
-  enemies.add(enemySpawn);
+void makeEnemy(ArrayList<PVector> enemies, ArrayList<Integer> colors, PVector enemySpawnn) {
+  //println(enemySpawn.x);                               // for testing
+  enemies.add(enemySpawnn);
   colors.add(int(random(3)));
-//  reds.add(int(red(eC)));
-//  blues.add(int(blue(eC)));
-//  greens.add(int(green(eC)));
 }
 
 //void spawnEnemy(ArrayList<PVector> enemies, ArrayList<Integer> colors,

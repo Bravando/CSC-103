@@ -33,9 +33,9 @@ class Square {
     fill = color(random(255), random(255), random(255));
     stroke = color(random(255), random(255), random(255));
   }
-  void move(Square squ) {
-    squ.x += squ.xSpeed;
-    squ.y += squ.ySpeed;
+  void move() {
+    x += xSpeed;
+    y += ySpeed;
   }
   void makesquare(Square squ) {
     fill(squ.fill);

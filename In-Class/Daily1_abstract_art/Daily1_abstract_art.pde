@@ -58,12 +58,12 @@ void draw() {
   square2.makesquare(square2);
   triangle1.maketriangle(triangle1);
   triangle2.maketriangle(triangle2);
-  circle1.move(circle1);
-  circle2.move(circle2);
-  square1.move(square1);
-  square2.move(square2);
-  triangle1.move(triangle1);
-  triangle2.move(triangle2);
+  circle1.move();
+  circle2.move();
+  square1.move();
+  square2.move();
+  triangle1.move();
+  triangle2.move();
   circle1.bounceatbounds();
   circle2.bounceatbounds();
   square1.bounceatbounds();
