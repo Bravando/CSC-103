@@ -1,13 +1,38 @@
 
+ColorBar bar;
+PVector place, size;
+color c1, c2, c3;
+
 void setup() {
+  size(800, 600);
+  size = new PVector(width,height/8);
+  place = new PVector(width/2,height*.875);
+  bar = new ColorBar(place, size, color(0));
+  c1 = color(255,0,0);
+  c2 = color(0,255,0);
+  c3 = color(0,0,255);
 }
 
 void draw() {
+  background(42);
+  bar.newButton(new PVector(width/4,height/4), height/8,true,true,c1);
+  bar.newButton(new PVector(width/2,height/4),height/8,true,true,c2);
+  bar.newButton(new PVector(width*.75,height/4),height/8,true,true,c3);
+  bar.drawAll();
+  textSize(30);
+  text("Click buttons to change",20,width/4);
+  text("Press the spacebar to reset", 60, width/4);
 }
 
+void mousePressed(){
+ bar.buttonClicked(); 
+}
 
-
-
+void keyPressed(){
+ if(key == ' '){
+   bar.resetBar();
+ }
+}
 
 
 
