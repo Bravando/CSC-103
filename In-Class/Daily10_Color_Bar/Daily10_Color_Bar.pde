@@ -2,30 +2,34 @@
 ColorBar bar;
 PVector place, size;
 color c1, c2, c3;
+Button button1;
 
 void setup() {
   size(800, 600);
   size = new PVector(width,height/8);
   place = new PVector(width/2,height*.875);
-  bar = new ColorBar(place, size, color(0));
+  bar = new ColorBar(place, size, color(255));
   c1 = color(255,0,0);
   c2 = color(0,255,0);
   c3 = color(0,0,255);
+  button1 = new Button(new PVector(width/4,height/4), height/8,true,true,c1);
 }
 
 void draw() {
   background(42);
+  strokeWeight(0);
   bar.newButton(new PVector(width/4,height/4), height/8,true,true,c1);
   bar.newButton(new PVector(width/2,height/4),height/8,true,true,c2);
   bar.newButton(new PVector(width*.75,height/4),height/8,true,true,c3);
+  //bar.addButton(button1);
   bar.drawAll();
   textSize(30);
-  text("Click buttons to change",20,width/4);
-  text("Press the spacebar to reset", 60, width/4);
+  text("Click buttons to change", width/4, height/2-30);
+  text("Press the spacebar to reset", width/4, height/2+30);
 }
 
 void mousePressed(){
- bar.buttonClicked(); 
+ bar.changeBar(); 
 }
 
 void keyPressed(){
@@ -40,7 +44,7 @@ class ColorBar {
   /*
   A bar that is a certain color. That color can be changed to the color of the button
    */
-  ArrayList<Button> buttons;
+  ArrayList<Button> buttons = new ArrayList<Button>();
   PVector posn, size;
   color c, initial;
 
@@ -74,6 +78,9 @@ class ColorBar {
   }
   void newButton(PVector posn, float size, boolean isSquare, boolean isOn, color c){
     buttons.add(new Button(posn,size,isSquare,isOn,c));
+  }
+  void addButton(Button b){
+    buttons.add(b);
   }
   Button buttonClicked(){
     Button jeff = new Button(c);
