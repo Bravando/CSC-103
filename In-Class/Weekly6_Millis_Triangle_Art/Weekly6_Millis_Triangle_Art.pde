@@ -1,31 +1,60 @@
-CircusTriangles bkg;
+CircusTriangles forAssignment,good;
+PVector center = new PVector(width/2,height/2);
 
 
 void setup() {
   size(800, 600);
-  bkg = new CircusTriangles();
+  forAssignment = new CircusTriangles(width,height);
+  good = new CircusTriangles();
+  center = new PVector(width/2,height/2);
+  noStroke();
 }
 
 void draw() {
   background(42);
-  bkg.render();
+  forAssignment.render();
+  //good.render();
+  //drawTriRowFromTo(center,0,width,0,4,color(255),color(255,0,0));    // For testing purposes
 }
 
 void mousePressed() {
-  bkg.emphasisAtMouse();
+  forAssignment.emphasisAtMouse();
+  //good.emphasisAtMouse();
+}
+
+void drawTriRowFromTo(PVector tip, float startX, float endX,float y, int number,color c1, color c2){
+  float howFar = endX-startX;
+ for(int i = 0;i<number;i++){
+   if(i%2 == 0){
+     fill(c1);
+   }else{
+     fill(c2);
+   }
+   triangle(tip.x,tip.y,startX+(howFar/number)*i,y,startX+(howFar/number)*(i+1),y);
+ }
 }
 
 class CircusTriangles {
-  PVector center = new PVector(width/2, height/2), emphasis = center;
-  float radius = width, interval = 500, timeStart = 0, timeNow = 0;
+  PVector center = new PVector(width/2, height/2), emphasis = center, side = new PVector(width,height);
+  float radius = width*0.66, interval = 500, timeStart = 0, timeNow = 0;
   color[] colors = {color(255), color(255, 0, 0)};
-  boolean runYet = false;
-  int numOfTri = 18, whichColor = 0;
+  boolean runYet = false, isRectBound = false;
+  int numOfTri = 18, whichColor = 0, initialColor = 0;
 
   CircusTriangles(PVector center, PVector emphasis, float radius, float rotationsPerSec, color[] colors, int numOfTri) {
     this.center = center;
     this.emphasis = emphasis;
     this.radius = radius;
+    interval = 1000/rotationsPerSec;
+    this.colors = colors;
+    this.numOfTri = numOfTri;
+  }
+   CircusTriangles(PVector center, PVector emphasis, float wid, float hgt, float rotationsPerSec, color[] colors, int numOfTri) {
+    this.center = center;
+    this.emphasis = emphasis;
+    side.x = wid;
+    side.y = hgt;
+    isRectBound = true;
     interval = 1000/rotationsPerSec;
     this.colors = colors;
     this.numOfTri = numOfTri;
@@ -40,11 +69,85 @@ class CircusTriangles {
   }
   CircusTriangles(float rotationsPerSec) {
     interval = 1000/rotationsPerSec;
+    center = new PVector(width/2, height/2);
+  }
+  CircusTriangles(float wid, float hgt) {
+    side.x = wid;
+    side.y = hgt;
+    isRectBound = true;
+    center = new PVector(width/2, height/2);
   }
   CircusTriangles() {
+    center = new PVector(width/2, height/2);
+  }
+  
+  void render(){
+    if(isRectBound){
+      renderRectBound();
+    }else{
+     renderCircleBound(); 
+    }
+  }
+  
+  void renderRectBound(){
+    if (!runYet) {
+      timeStart = millis();
+      runYet = true;
+    }
+    timeNow = millis();
+    if (timeNow >= timeStart+interval) {
+      initialColor++;
+      timeStart = timeNow;
+    }
+    whichColor = initialColor;
+    whichColor = drawTris(whichColor,true,true);
+    whichColor = drawTris(whichColor,false,false);
+    whichColor = drawTris(whichColor,true,false);
+    drawTris(whichColor,false,true);
+  }
+  int drawTris(int starter, boolean isAcross, boolean isStartingTopLeft){
+    int trisAcross = int((side.x*numOfTri)/((side.y+side.x)*2)), trisDown = numOfTri/2-trisAcross,start = starter+1, i = start;
+    if(isAcross){
+      if(isStartingTopLeft){
+        while(i<trisAcross+start){
+          fill(colors[i%colors.length]);
+          triangle(emphasis.x,emphasis.y,
+          center.x-(side.x/2)+(side.x/trisAcross)*(i-start),center.y-side.y/2,
+          center.x-(side.x/2)+(side.x/trisAcross)*(i+1-start),center.y-side.y/2);
+          i++;
+     }
+     }else{
+       while(i<trisAcross+start){
+          fill(colors[i%colors.length]);
+          triangle(emphasis.x,emphasis.y,
+          center.x+side.x/2-(side.x/trisAcross)*(i-start),center.y+side.y/2,
+          center.x+side.x/2-(side.x/trisAcross)*(i+1-start),center.y+side.y/2);
+          i++;
+     }
+     }
+    }else{
+      if(isStartingTopLeft){
+        while(i<trisDown+start){
+          fill(colors[i%colors.length]);
+          triangle(emphasis.x,emphasis.y,
+          center.x+side.x/2,center.y-side.y/2+(side.y/trisDown)*(i-start),
+          center.x+side.x/2,center.y-side.y/2+(side.y/trisDown)*(i+1-start));
+          i++;
+     }
+     }else{
+       while(i<trisDown+start){
+          fill(colors[i%colors.length]);
+          triangle(emphasis.x,emphasis.y,
+          center.x-side.x/2,center.y+side.y/2-(side.y/trisDown)*(i-start),
+          center.x-side.x/2,center.y+side.y/2-(side.y/trisDown)*(i+1-start));
+          i++;
+     }
+     }
+    }
+    return i;
   }
 
-  void render() {
+  void renderCircleBound() {
     if (!runYet) {
       timeStart = millis();
       runYet = true;
