@@ -1,11 +1,13 @@
-CircusTriangles bkg = new CircusTriangles();
+CircusTriangles bkg;
 
 
 void setup() {
   size(800, 600);
+  bkg = new CircusTriangles();
 }
 
 void draw() {
+  background(42);
   bkg.render();
 }
 
@@ -15,7 +17,7 @@ void mousePressed() {
 
 class CircusTriangles {
   PVector center = new PVector(width/2, height/2), emphasis = center;
-  float radius = width, interval = 1000, timeStart = 0, timeNow = 0;
+  float radius = width, interval = 500, timeStart = 0, timeNow = 0;
   color[] colors = {color(255), color(255, 0, 0)};
   boolean runYet = false;
   int numOfTri = 18, whichColor = 0;
@@ -36,6 +38,9 @@ class CircusTriangles {
     this.colors = colors;
     this.numOfTri = numOfTri;
   }
+  CircusTriangles(float rotationsPerSec) {
+    interval = 1000/rotationsPerSec;
+  }
   CircusTriangles() {
   }
 
@@ -45,25 +50,36 @@ class CircusTriangles {
       runYet = true;
     }
     timeNow = millis();
-    for (int i = whichColor; i<numOfTri; i++) {
+    for (int i = whichColor; i<numOfTri+whichColor; i++) {
       fill(colors[i%colors.length]);
-      makeTriToRadius(i);
+      makeTriToRadius(i-whichColor);
     }
     if (timeNow >= timeStart+interval) {
       whichColor++;
       timeStart = timeNow;
     }
   }
+  
   void makeTriToRadius(int whichTri) {
-    float firstPointX = radius*cos((360/numOfTri)*(whichTri%numOfTri));
-    float firstPointY = radius*sin((360/numOfTri)*(whichTri%numOfTri));
-
+    float firstPointX = center.x+radius*cos((TWO_PI/numOfTri)*(whichTri%numOfTri));
+    float firstPointY = center.y-radius*sin((TWO_PI/numOfTri)*(whichTri%numOfTri));
+    
     // The "second" point is the first point of the next triangle clockwise
-    float secondPointX = radius*cos((360/numOfTri)*((whichTri+1)%numOfTri));
-    float secondPointY = radius*sin((360/numOfTri)*((whichTri+1)%numOfTri));
-
+    float secondPointX = center.x+radius*cos((TWO_PI/numOfTri)*((whichTri+1)%numOfTri));
+    float secondPointY = center.y-radius*sin((TWO_PI/numOfTri)*((whichTri+1)%numOfTri));
+    
     triangle(emphasis.x, emphasis.y, firstPointX, firstPointY, secondPointX, secondPointY);
   }
+  //float correctAngleAroundCircle(PVector angle,boolean xInverted,boolean yInverted){
+  //  for(int i = 0;i<angle%90;i++){
+  //   if(i%2 == 0){
+  //    xInverted = !xInverted;
+  //   }else{
+  //    yInverted = !yInverted; 
+  //   }
+  //  }
+  //  if(
+  //}
   void changeEmphasis(PVector place) {
     emphasis = place;
   }
