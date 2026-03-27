@@ -1,12 +1,12 @@
 class PingPongBall {
   PVector posn, secondLastPosn, thirdLastPosn, speed, firstPosn, firstSpeed;
-  float diameter, leniency, trueSize, minX = 3, maxX = 7, minY = -5, maxY = 5;
-  boolean bounced = false;
+  float diameter, leniency, trueSize, minX = 3, maxX = 7, minY = -5, maxY = 5, millisBeforeMove = 1000, currentTime = 0, initialTime = 0;
+  boolean bounced = false, isActive = true;
   color c = color(255);
-  int scoreLeft = 0, scoreRight = 0, ballTimer = 90, maxScore = 3;
-  String winner = "";
+  int ballTimer = 90, maxScore = 3;
+  Racket left, right;
 
-  PingPongBall(PVector firstPosn, PVector speed, float size, float leniency) {
+  PingPongBall(PVector firstPosn, PVector speed, float size, float leniency, Racket left, Racket right) {
     posn = firstPosn;
     secondLastPosn = firstPosn;
     thirdLastPosn = firstPosn;
@@ -16,8 +16,10 @@ class PingPongBall {
     diameter = size;
     this.leniency = leniency;
     trueSize = size + leniency;
+    this.left = left;
+    this.right = right;
   }
-  PingPongBall(PVector firstPosn, PVector speed, float size, float leniency, float ballTimer) {
+  PingPongBall(PVector firstPosn, PVector speed, float size, float leniency, float ballTimer, Racket left, Racket right) {
     posn = firstPosn;
     secondLastPosn = firstPosn;
     thirdLastPosn = firstPosn;
@@ -28,8 +30,10 @@ class PingPongBall {
     this.leniency = leniency;
     trueSize = size + leniency;
     this.ballTimer = int(ballTimer);
+    this.left = left;
+    this.right = right;
   }
-  PingPongBall(PVector firstPosn, PVector speed, float size, float leniency, color c) {
+  PingPongBall(PVector firstPosn, PVector speed, float size, float leniency, color c, Racket left, Racket right) {
     posn = firstPosn;
     secondLastPosn = firstPosn;
     thirdLastPosn = firstPosn;
@@ -40,8 +44,11 @@ class PingPongBall {
     this.leniency = leniency;
     trueSize = size + leniency;
     this.c = c;
+    this.left = left;
+    this.right = right;
   }
-  PingPongBall(PVector firstPosn, PVector speed, float size, float leniency, float minXSpeed, float maxXSpeed, float minYSpeed, float maxYSpeed) {
+  PingPongBall(PVector firstPosn, PVector speed, float size, float leniency,
+    float minXSpeed, float maxXSpeed, float minYSpeed, float maxYSpeed, Racket left, Racket right) {
     posn = firstPosn;
     secondLastPosn = firstPosn;
     thirdLastPosn = firstPosn;
@@ -55,8 +62,11 @@ class PingPongBall {
     maxX = maxXSpeed;
     minY = minYSpeed;
     maxY = maxYSpeed;
+    this.left = left;
+    this.right = right;
   }
-  PingPongBall(PVector firstPosn, PVector speed, float size, float leniency, color c, float minXSpeed, float maxXSpeed, float minYSpeed, float maxYSpeed) {
+  PingPongBall(PVector firstPosn, PVector speed, float size, float leniency, color c,
+    float minXSpeed, float maxXSpeed, float minYSpeed, float maxYSpeed, Racket left, Racket right) {
     posn = firstPosn;
     secondLastPosn = firstPosn;
     thirdLastPosn = firstPosn;
@@ -71,8 +81,11 @@ class PingPongBall {
     minY = minYSpeed;
     maxY = maxYSpeed;
     this.c = c;
+    this.left = left;
+    this.right = right;
   }
-  PingPongBall(PVector firstPosn, PVector speed, float size, float leniency, color c, float minXSpeed, float maxXSpeed, float minYSpeed, float maxYSpeed, int ballTimer, int scoreToWin) {
+  PingPongBall(PVector firstPosn, PVector speed, float size, float leniency, color c,
+    float minXSpeed, float maxXSpeed, float minYSpeed, float maxYSpeed, int ballTimer, int scoreToWin, Racket left, Racket right) {
     posn = firstPosn;
     secondLastPosn = firstPosn;
     thirdLastPosn = firstPosn;
@@ -89,6 +102,8 @@ class PingPongBall {
     this.c = c;
     this.ballTimer = ballTimer;
     maxScore = scoreToWin;
+    this.left = left;
+    this.right = right;
   }
   boolean didHitRacket(Racket paddle) {
     return (paddle.hit(posn.x-trueSize, posn.y) ||
@@ -120,62 +135,69 @@ class PingPongBall {
     }
   }
   void move() {
-    thirdLastPosn = secondLastPosn;
-    secondLastPosn = posn;
-    speed.x = constrain(speed.x,-maxX,maxX);
-    if(speed.x > 0 && speed.x < minX){
-     speed.x = minX; 
-    }else if(speed.x < 0 && speed.x > -minX){
-     speed.x = -minX; 
-    }
-    speed.y = constrain(speed.y,minY,maxY);
-    if(speed.y > 0 && speed.y < minY){
-     speed.y = minY; 
-    }else if(speed.y < 0 && speed.y > minY){
-     speed.y = -minY;}
-    posn = addPVector(posn, speed);
-    if (posn.y >= height-diameter/2) {
-      posn.y = height-diameter/2;
-      speed.y = -abs(speed.y);
-    } else if (posn.y <= diameter/2) {
-      posn.y = diameter/2;
-      speed.y = abs(speed.y);
-    }
-  }
-  void make() {
-    makeCircle(thirdLastPosn.x, thirdLastPosn.y, diameter/1.2, c);
-    makeCircle(secondLastPosn.x, secondLastPosn.y, diameter/1.1, c);
-    makeCircle(posn.x, posn.y, diameter, c);
-  }
-  int score() {
-    if (posn.x > width-diameter/2) {
-      scoreLeft++;
-      posn = firstPosn;
-      secondLastPosn = firstPosn;
-      thirdLastPosn = firstPosn;
-      speed.y = firstSpeed.y+random(-1,1);
-      speed.x = 3;
-      return ballTimer;
-    } else if (posn.x < diameter/2) {
-      scoreRight++;
-      posn = firstPosn;
-      secondLastPosn = firstPosn;
-      thirdLastPosn = firstPosn;
-      speed.y = firstSpeed.y+random(-6,0);
-      speed.x = -3;
-      println(firstSpeed);
-      return ballTimer;
+    currentTime = millis();
+    if (isActive && currentTime >= initialTime+millisBeforeMove) {
+      thirdLastPosn = secondLastPosn;
+      secondLastPosn = posn;
       
-    }else{return 0;}
-  }
-  boolean anyWon(){
-    return(scoreLeft >= maxScore || scoreRight >= maxScore);
-  }
-  void win(){
-    if(scoreLeft >= maxScore){
-      winner = "Left";
-    }else{
-      winner = "Right";
+      speed.x = constrain(speed.x, -maxX, maxX);
+      if (speed.x > 0) {
+        speed.x = constrain(speed.x, minX, maxX);
+      } else {
+        speed.x = constrain(speed.x, -minX, -maxX);
+      }
+      /*    //Old Version
+      speed.x = constrain(speed.x, -maxX, maxX);
+      if (speed.x > 0 && speed.x < minX) {
+        speed.x = minX;
+      } else if (speed.x < 0 && speed.x > -minX) {
+        speed.x = -minX;
+      }
+      */
+      
+      speed.y = constrain(speed.y, minY, maxY);
+      
+      /*
+      if (speed.y > 0 && speed.y < minY) {
+        speed.y = minY;
+      } else if (speed.y < 0 && speed.y > minY) {
+        speed.y = -minY;
+      }*/
+      
+      posn = addPVector(posn, speed);
+      if (posn.y >= height-diameter/2) {
+        speed.y = -abs(speed.y);
+      } else if (posn.y <= diameter/2) {
+        speed.y = abs(speed.y);
+      }
+      posn.y = constrain(posn.y,diameter/2,height-diameter/2);
     }
+  }
+  void render() {
+    if (isActive) {
+      makeCircle(thirdLastPosn.x, thirdLastPosn.y, diameter/1.2, c);
+      makeCircle(secondLastPosn.x, secondLastPosn.y, diameter/1.1, c);
+      makeCircle(posn.x, posn.y, diameter, c);
+    }
+  }
+  void score() {
+    if (posn.x > width-diameter/2) {
+      left.points++;
+      reset();
+      speed.y = firstSpeed.y+random(-1, 1);
+      speed.x = 3;
+    } else if (posn.x < diameter/2) {
+      right.points++;
+      reset();
+      speed.y = firstSpeed.y+random(-1, 1);
+      speed.x = -3;
+    }
+  }
+  void reset() {
+    posn = firstPosn;
+    secondLastPosn = firstPosn;
+    thirdLastPosn = firstPosn;
+    initialTime = millis();
+    //println(firstSpeed);
   }
 }

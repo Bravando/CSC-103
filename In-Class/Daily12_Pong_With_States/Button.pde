@@ -1,5 +1,5 @@
 class Button {
-  boolean isPressed = false, isRounded = false, eachRounded = false, isRect = true;
+  boolean isPressed = false, isRounded = false, eachRounded = false, isRect = true, active = true;
   float roundSize,topLeftRound,topRightRound,botLeftRound,botRightRound,roundness;
   PVector loc, rectSize;
   color c;
@@ -45,16 +45,73 @@ class Button {
   rectSize = new PVector(wid,hgt);
   this.c = c;
   }
+  Button(PVector location,PVector size,float howRounded,color c){
+    // makes a rectangular button at the given location with the given size with rounded edges
+  loc = location;
+  rectSize = size;
+  roundness = howRounded;
+  isRounded = true;
+  this.c = c;
+  }
+  Button(PVector location,float wid,float hgt,float howRounded,color c){
+    // makes a rectangular button at the given location with the given width and height with rounded edges
+  loc = location;
+  rectSize = new PVector(wid,hgt);
+  roundness = howRounded;
+  isRounded = true;
+  this.c = c;
+  }
+  Button(float x,float y,PVector size,float howRounded,color c){
+    // makes a rectangular button at the given x and y positions with the given size with rounded edges
+  loc = new PVector(x,y);
+  rectSize = size;
+  roundness = howRounded;
+  isRounded = true;
+  this.c = c;
+  }
   Button(float x,float y,float wid,float hgt,float howRounded,color c){
-    // makes a rectangular button at the given x and y positions with the given width and height
+    // makes a rectangular button at the given x and y positions with the given width and height with rounded edges
   loc = new PVector(x,y);
   rectSize = new PVector(wid,hgt);
   roundness = howRounded;
   isRounded = true;
   this.c = c;
   }
+  Button(PVector location,PVector size,float topLeftRound,float topRightRound,float botLeftRound,float botRightRound,color c){
+    // makes a rectangular button at the given location with the given size with individually rounded edge
+  loc = location;
+  rectSize = size;
+  this.topLeftRound = topLeftRound;
+  this.topRightRound = topRightRound;
+  this.botLeftRound = botLeftRound;
+  this.botRightRound = botRightRound;
+  eachRounded = true;
+  this.c = c;
+  }
+  Button(PVector location,float wid,float hgt,float topLeftRound,float topRightRound,float botLeftRound,float botRightRound,color c){
+    // makes a rectangular button at the given location with the given width and height with individually rounded edge
+  loc = location;
+  rectSize = new PVector(wid,hgt);
+  this.topLeftRound = topLeftRound;
+  this.topRightRound = topRightRound;
+  this.botLeftRound = botLeftRound;
+  this.botRightRound = botRightRound;
+  eachRounded = true;
+  this.c = c;
+  }
+  Button(float x,float y,PVector size,float topLeftRound,float topRightRound,float botLeftRound,float botRightRound,color c){
+    // makes a rectangular button at the given x and y positions with the given size with individually rounded edge
+  loc = new PVector(x,y);
+  rectSize = size;
+  this.topLeftRound = topLeftRound;
+  this.topRightRound = topRightRound;
+  this.botLeftRound = botLeftRound;
+  this.botRightRound = botRightRound;
+  eachRounded = true;
+  this.c = c;
+  }
   Button(float x,float y,float wid,float hgt,float topLeftRound,float topRightRound,float botLeftRound,float botRightRound,color c){
-    // makes a rectangular button at the given x and y positions with the given width and height
+    // makes a rectangular button at the given x and y positions with the given width and height with individually rounded edge
   loc = new PVector(x,y);
   rectSize = new PVector(wid,hgt);
   this.topLeftRound = topLeftRound;
@@ -79,6 +136,7 @@ class Button {
     }else{
      renderCircleButton(); 
     }
+    beingPressed();
   }
   void renderCircleButton(){
     if(isPressed){
@@ -95,17 +153,24 @@ class Button {
     noStroke();
     rect(loc.x,loc.y,rectSize.x,rectSize.y);
   }
+  void beingPressed(){
+    isPressed = mouseInButton() && active && mousePressed;
+  }
   
-  boolean mousePressed(){
-    isPressed = mouseInButton();
-    return isPressed;
+  void whenPressed(Runnable func){
+    if(mouseInButton() && active && mousePressed){
+     func.run();
+    }
   }
-  void mouseReleased(){
-    isPressed = false;
+  void whenReleased(Runnable func){
+    if(isPressed){
+     func.run();
+     isPressed = false;
+    }
   }
-  boolean mouseClicked(){
-   return mouseInButton(); 
-  }
+  //boolean mouseClicked(){
+  // return mouseInButton() && active; 
+  //}
   color darken(color c){
    return color(red(c)/2,green(c)/2,blue(c)/2); 
   }
