@@ -30,6 +30,13 @@ void drawBubList(ArrayList<Bubble> bubList) {
     bubList.get(i).render();
   }
 }
+/*    // Example of a ForEach Loop
+void drawBubList(ArrayList<Bubble> bubList) {
+  for (Bubble aBub : bubList) {
+    aBub.render();
+  }
+}
+*/
 void keyPressed() {
   if (key == 'a') {
     upBubs.add(new Bubble(randomColor()));
