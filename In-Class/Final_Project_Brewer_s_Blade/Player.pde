@@ -1,22 +1,25 @@
 class Player {
   PVector posn, // the point where the camera is
-          velX, // how fast the camera is moving in the X direction
-          velZ, // how fast the camera is moving in the Z direction
-          forwardAcc, // how fast the camera is accelerating in the direction it is looking
-          sidewaysAcc,// how fast the camera is accelerating PI/2 radians of the direction it is looking
-          dir,        // the point where the camera is looking
-          rotation = new PVector(600,10.5);  // how much the camera is rotated over the x and y axies respectively
-  float topSpeed,
-        hitDist = 100;
+    velX, // how fast the camera is moving in the X direction
+    velZ, // how fast the camera is moving in the Z direction
+    forwardAcc, // how fast the camera is accelerating in the direction it is looking
+    sidewaysAcc, // how fast the camera is accelerating PI/2 radians of the direction it is looking
+    dir, // the point where the camera is looking
+    rotation = new PVector(600, 10.5);  // how much the camera is rotated over the x and y axies respectively
+  float topSpeed, hitRadius = 200;
   boolean isForward = false,
     isBackward = false,
     isLeft = false,
     isRight = false,
     isDead = false;
-  int hp = 100,
-      currentTime = 0,
-      initialTime = 0,
-      hitBuffer = 500;
+  int maxHp = 100,
+    hp = maxHp,
+    currentTime = 0,
+    initialTimeHit = 0,
+    initialTimeAttack = 0,
+    hitBuffer = 500,
+    timeBetweenAttacks = 200,
+    damage = 10;
 
 
   Player() {
@@ -36,33 +39,33 @@ class Player {
     // Rotate camera horizontally
     pushMatrix();
     translate(posn.x, posn.y, posn.z);
-    
-    rotation.y +=((-mouseX+width/2)*0.007);
-    rotateY(rotation.y);
-    
-    translate(0, 0, -200); 
 
-    dir.x = modelX(0, 0, 0); 
-    dir.z = modelZ(0, 0, 0); 
+    rotation.y += ((-mouseX+width/2)*0.007);
+    rotateY(rotation.y);
+
+    translate(0, 0, -200);
+
+    dir.x = modelX(0, 0, 0);
+    dir.z = modelZ(0, 0, 0);
     popMatrix();
 
     // Rotate camera vertically
     pushMatrix();
     translate(posn.x, posn.y, posn.z);
-    
-    rotation.x = constrain(rotation.x+((mouseY-height/2)*0.01), -PI/2,PI/2);
+
+    rotation.x = constrain(rotation.x+((mouseY-height/2)*0.01), -PI/2, PI/2);
     rotateX(rotation.x);
-    
+
     translate(0, 0, -200);
-    
+
     dir.y = modelY(0, 0, 0);
     popMatrix();
   }
-  
+
   void move() {
     PVector placeLookingHorizontally = new PVector(dir.x, posn.y, dir.z);
     forwardAcc = PVector.sub(placeLookingHorizontally, posn);
-    
+
     Runnable moveZ = new Runnable() {
       void run() {
         velZ.add(forwardAcc);
@@ -70,18 +73,18 @@ class Player {
         posn.add(velZ);
       }
     };
-    
+
     pushMatrix();
     translate(posn.x, posn.y, posn.z);
     rotateY(rotation.y+PI/2);
     translate(0, 0, -200);
-    float leftX = modelX(0,0,0);
-    float leftZ = modelZ(0,0,0);
+    float leftX = modelX(0, 0, 0);
+    float leftZ = modelZ(0, 0, 0);
     popMatrix();
-    
+
     PVector rightOfPlaceLookingHorizontally = new PVector(leftX, posn.y, leftZ);
     sidewaysAcc = PVector.sub(rightOfPlaceLookingHorizontally, posn);
-    
+
     Runnable moveX = new Runnable() {
       void run() {
         velX.add(sidewaysAcc);
@@ -89,18 +92,18 @@ class Player {
         posn.add(velX);
       }
     };
-    
+
     if (isForward) {
       forwardAcc.setMag(5);
       moveZ.run();
     } else if (isBackward) {
-     forwardAcc.setMag(-5);
+      forwardAcc.setMag(-5);
       moveZ.run();
     }
-    if (isLeft){
+    if (isLeft) {
       sidewaysAcc.setMag(5);
       moveX.run();
-    } else if (isRight){
+    } else if (isRight) {
       sidewaysAcc.setMag(-5);
       moveX.run();
     }
@@ -130,13 +133,56 @@ class Player {
       isRight = false;
     }
   }
-  
-  void attacked(Enemy e){
+
+  void attackedBy(Enemy e) {
     currentTime = millis();
-   if(e.isAttacking && (dist(e.posn.x,e.posn.z,posn.x,posn.z) < hitDist) && (currentTime > initialTime+hitBuffer)){
-     hp -= e.damage;
-     initialTime = millis();
-     println(hp);
+    if (e.isAttacking && (dist(e.posn.x, e.posn.z, posn.x, posn.z) < e.hitDist) && (currentTime > initialTimeHit+hitBuffer)) {
+      hp -= e.damage;
+      initialTimeHit = millis();
+      println(hp);
+    }
+  }
+  void attackedBy(ArrayList<Enemy> es){
+   for(int i = 0;i<es.size();i++){
+    attackedBy(es.get(i)); 
    }
+  }
+  void attack(Enemy e) {
+    currentTime = millis();
+      if (currentTime > initialTimeAttack+timeBetweenAttacks) {
+      initialTimeAttack = millis();
+      
+      //println("attack!");
+      
+      if (dist(e.posn.x, e.posn.z, dir.x, dir.z)<hitRadius) {
+        e.hp -= damage;
+        // !!! Play feedback
+        println("Hit!");
+        print("  " + e.hp);
+      }
+    }
+  }
+  void attack(ArrayList<Enemy> es){
+    for(int i = 0;i<es.size();i++){
+    attack(es.get(i)); 
+   }
+  }
+  void healthBar(){
+    hp = constrain(hp,0,maxHp);
+   pushMatrix();
+   hint(DISABLE_DEPTH_TEST);
+   camera();
+   
+   rectMode(CORNER);
+   noStroke();
+   
+   float wid = width/3,hgt = height/20,widsFromRight = 0.25,hgtsFromBottom = 2;
+   fill(200,0,0);
+   rect(width-(wid*(1 + widsFromRight)),height-(hgt*hgtsFromBottom),wid,hgt);
+   fill(100,255,5);
+   rect(width-(wid*(1 + widsFromRight)),height-(hgt*hgtsFromBottom),wid*map(maxHp-hp,100,0,0,1),hgt);
+   
+   hint(ENABLE_DEPTH_TEST);
+   popMatrix();
   }
 }
