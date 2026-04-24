@@ -14,17 +14,20 @@ Weapon stick;
 color wolfC, deerC, bearC;
 
 int currentState = 0;
+boolean canPointerEscape = false;
 PGraphics end;
 SoundFile wolfAttack, bgMusic;
 
 
 void setup() {
-  size(800, 500, P3D);
+  size(800, 600, P3D);
   smooth(0);
   cursorControls = (GLWindow) surface.getNative();
+  if(!canPointerEscape){
   cursorControls.setPointerVisible(false);
   cursorControls.confinePointer(true);
   cursorControls.warpPointer(width, height);
+  }
   wolfAttack = new SoundFile(this, "Wolf Growl 4 10 26.mp3");
   bgMusic = new SoundFile(this, "deuslower-medieval-ambient-236809.mp3");
   wolfC = color(100, 100, 120);
@@ -54,23 +57,23 @@ void setup() {
   for (int i = 0; i<waves.length; i++) {
     waves[i] =  new ArrayList<Enemy>();
   }
-  waves[0].add(wolf1);
-  waves[1].add(wolf2);
-  waves[1].add(wolf3);
+  waves[0].add(wolf1());
+  waves[1].add(wolf2());
+  waves[1].add(wolf3());
   //waves[1].add(deer1);
-  waves[2].add(wolf1);
-  waves[2].add(wolf2);
-  waves[2].add(wolf3);
+  waves[2].add(wolf1());
+  waves[2].add(wolf2());
+  waves[2].add(wolf3());
   //waves[2].add(deer3);
-  waves[3].add(wolf1);
-  waves[3].add(wolf2);
-  waves[3].add(wolf3);
-  waves[3].add(wolf4);
+  waves[3].add(wolf1());
+  waves[3].add(wolf2());
+  waves[3].add(wolf3());
+  waves[3].add(wolf4());
   //waves[3].add(deer1);
   //waves[3].add(deer3);
   waves[4].add(bearBoss);
-  waves[4].add(wolf2);
-  waves[4].add(wolf3);
+  waves[4].add(wolf2());
+  waves[4].add(wolf3());
   //waves[4].add(deer2);
   //waves[4].add(deer3);
 }
@@ -108,7 +111,9 @@ void draw() {
   //noStroke();
 
   makeRoom();
+  if(!canPointerEscape){
   cursorControls.warpPointer(width, height);
+  }
   character.makeCam();
   character.posn.x = constrain(character.posn.x, -950, 500);
   character.posn.z = constrain(character.posn.z, -950, 500);
@@ -250,6 +255,7 @@ void squareWall(float x, float y, float z, int howManyUp, int howManyWide, color
 }
 void nextWave() {
   resetWolves();
+  println(wolf1Start);
   currentState++;
   character.hp+=30;
   character.damage+=5;
@@ -333,11 +339,28 @@ void makeRoom() {
 }
 void resetWolves(){
  wolf1.reset();
- wolf1.posn = wolf1Start;
+ //wolf1Start = new PVector(-835, 300, -855);
+ //wolf1.posn = wolf1Start;
  wolf2.reset();
- wolf2.posn = wolf2Start;
+ //wolf2Start = new PVector(-835, 300, 300);
+ //wolf2.posn = wolf2Start;
  wolf3.reset();
- wolf3.posn = wolf3Start;
+ //wolf3Start = new PVector(300, 300, -855);
+ //wolf3.posn = wolf3Start;
  wolf4.reset();
- wolf4.posn = wolf4Start;
+ //wolf4Start = new PVector(300, 300, 300);
+ //wolf4.posn = wolf4Start;
+}
+
+Enemy wolf1(){
+  return new Enemy(wolf1Start, wolfC, wolfAttack);
+}
+Enemy wolf2(){
+  return new Enemy(wolf2Start, wolfC, wolfAttack);
+}
+Enemy wolf3(){
+  return new Enemy(wolf3Start, wolfC, wolfAttack);
+}
+Enemy wolf4(){
+  return new Enemy(wolf4Start, wolfC, wolfAttack);
 }

@@ -9,13 +9,13 @@ class Enemy implements Renderable {
   ArrayList<Enemy> projectiles = new ArrayList<>();
 
   Enemy(PVector posn, color c) {
-    this.posn = posn;
-    firstPosn = posn;
+    firstPosn = posn.copy();
+    this.posn = firstPosn.copy();
     this.c = c;
   }
   Enemy(PVector posn, color c,SoundFile attack) {
-    this.posn = posn;
-    firstPosn = posn;
+    firstPosn = posn.copy();
+    this.posn = firstPosn.copy();
     this.c = c;
     attackSound = attack;
   }
