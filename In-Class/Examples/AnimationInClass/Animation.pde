@@ -1,4 +1,4 @@
-class AnimationClass {
+class Animation {
   // variables
   PImage[] images;
   float speed;

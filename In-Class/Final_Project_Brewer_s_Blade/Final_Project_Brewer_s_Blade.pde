@@ -9,6 +9,7 @@ PVector wolf1Start = new PVector(-835, 300, -855), wolf2Start = new PVector(-835
         wolf3Start = new PVector(300, 300, -855), wolf4Start = new PVector(300, 300, 300);
 ArrayList<Enemy> enemies;
 ArrayList<Projectile> projectiles = new ArrayList<>();
+PShape[] wolfAnim, bearWalk, bearWindup, bearAttackAnim;
 ArrayList[] waves = new ArrayList[5];
 Weapon stick;
 color wolfC, deerC, bearC;
@@ -16,11 +17,11 @@ color wolfC, deerC, bearC;
 int currentState = 0;
 boolean canPointerEscape = false;
 PGraphics end;
-SoundFile wolfAttack, bgMusic;
+SoundFile wolfAttack, bgMusic, bearAttack;
 
 
 void setup() {
-  size(800, 600, P3D);
+  size(1200, 900, P3D);
   smooth(0);
   cursorControls = (GLWindow) surface.getNative();
   if(!canPointerEscape){
@@ -30,22 +31,27 @@ void setup() {
   }
   wolfAttack = new SoundFile(this, "Wolf Growl 4 10 26.mp3");
   bgMusic = new SoundFile(this, "deuslower-medieval-ambient-236809.mp3");
+  bearAttack = new SoundFile(this, "bear growl 4 27 26.mp3");
+  wolfAnim = load3DAnimation(25,"low_poly_wolf_animated","obj");
+  bearWalk = load3DAnimation(40,"low_poly_bear_walk","obj");
+  bearWindup = load3DAnimation(10,"low_poly_bear_windup","obj");
+  bearAttackAnim = load3DAnimation(16,"low_poly_bear_attack","obj");
   wolfC = color(100, 100, 120);
   deerC = color(126, 37, 191);
   bearC = color(152, 120, 55);
   character = new Player();
-  wolf1 = new Enemy(wolf1Start, wolfC, wolfAttack);
+  wolf1 = new Enemy(wolf1Start, wolfC, wolfAttack, wolfAnim);
   wolf1Base = wolf1;
-  wolf2 = new Enemy(wolf2Start, wolfC, wolfAttack);
+  wolf2 = new Enemy(wolf2Start, wolfC, wolfAttack, wolfAnim);
   wolf2Base = wolf2;
-  wolf3 = new Enemy(wolf3Start, wolfC, wolfAttack);
+  wolf3 = new Enemy(wolf3Start, wolfC, wolfAttack, wolfAnim);
   wolf3Base = wolf3;
-  wolf4 = new Enemy(wolf4Start, wolfC, wolfAttack);
+  wolf4 = new Enemy(wolf4Start, wolfC, wolfAttack, wolfAnim);
   wolf4Base = wolf4;
   //deer1 = new Shooter(new PVector(-835, 300, -855), deerC, wolfAttack);
   //deer2 = new Shooter(new PVector(-835, 300, 300), deerC, wolfAttack);
   //deer3 = new Shooter(new PVector(300, 300, 300), deerC, wolfAttack);
-  bearBoss = new Enemy(new PVector(-835, 300, -855), bearC, wolfAttack);
+  bearBoss = new Enemy(new PVector(-835, 300, -855), bearC, bearAttack, bearWalk, bearWindup, bearAttackAnim);
   bearBoss.hp = 300;
   bearBoss.damage = 30;
   bearBoss.attackWindUp *= 2;
@@ -57,23 +63,23 @@ void setup() {
   for (int i = 0; i<waves.length; i++) {
     waves[i] =  new ArrayList<Enemy>();
   }
-  waves[0].add(wolf1());
-  waves[1].add(wolf2());
-  waves[1].add(wolf3());
+  waves[0].add(wolf1);
+  waves[1].add(wolf2);
+  waves[1].add(wolf3);
   //waves[1].add(deer1);
-  waves[2].add(wolf1());
-  waves[2].add(wolf2());
-  waves[2].add(wolf3());
+  waves[2].add(wolf1);
+  waves[2].add(wolf2);
+  waves[2].add(wolf3);
   //waves[2].add(deer3);
-  waves[3].add(wolf1());
-  waves[3].add(wolf2());
-  waves[3].add(wolf3());
-  waves[3].add(wolf4());
+  waves[3].add(wolf1);
+  waves[3].add(wolf2);
+  waves[3].add(wolf3);
+  waves[3].add(wolf4);
   //waves[3].add(deer1);
   //waves[3].add(deer3);
   waves[4].add(bearBoss);
-  waves[4].add(wolf2());
-  waves[4].add(wolf3());
+  waves[4].add(wolf2);
+  waves[4].add(wolf3);
   //waves[4].add(deer2);
   //waves[4].add(deer3);
 }
@@ -363,4 +369,20 @@ Enemy wolf3(){
 }
 Enemy wolf4(){
   return new Enemy(wolf4Start, wolfC, wolfAttack);
+}
+
+PImage[] loadAnimation(Integer frames, String fileName, String extension) {
+  PImage[] animationFrames = new PImage[frames];
+  for (int i=0; i<= animationFrames.length-1; i++) {
+    animationFrames[i] = loadImage(fileName + i + "." + extension);
+  }
+  return animationFrames;
+}
+
+PShape[] load3DAnimation(Integer frames, String fileName, String extension) {
+  PShape[] animationFrames = new PShape[frames];
+  for (int i=0; i<= animationFrames.length-1; i++) {
+    animationFrames[i] = loadShape(fileName + i + "." + extension);
+  }
+  return animationFrames;
 }

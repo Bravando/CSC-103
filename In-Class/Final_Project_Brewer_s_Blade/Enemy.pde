@@ -1,50 +1,84 @@
 class Enemy implements Renderable {
-  PVector posn,firstPosn, size = new PVector(50, 50, 100);
+  PVector posn, firstPosn, size = new PVector(50, 50, 100);
   float rotation = 0, baseSpeed = 3, speedDuringAttack = baseSpeed*3, speed = baseSpeed, attackingRange = 300;
   int currentTime, initialTimeReadying, initialTimeAttacking, attackWindUp = 500, attackDuration = 200,
-    attackCooldown = 500, damage = 15, hp = 50, initialSpawnTime, timeToSpawn = 2000, hitDist = 200;
-  boolean isAttacking = false, isDead = true, isReadyingAttack = false, isSpawning = false, isShooter = false;
+    attackCooldown = 500, damage = 15, hp = 50, initialSpawnTime, timeToSpawn = 2000, hitDist = 200, walkFrame = 0,
+    attackFrame = 0, windupFrame = 0;
+  boolean isAttacking = false, isDead = true, isReadyingAttack = false, isSpawning = false, isShooter = false, isWalkAnimated = false,
+    isAttackAnimated = false, isWindupAnimated = false, isAnimated = false;
   color c, attackingC = color(200, 100, 100);
   SoundFile attackSound;
   ArrayList<Enemy> projectiles = new ArrayList<>();
+  PShape[] walk, windup, attack;
 
   Enemy(PVector posn, color c) {
     firstPosn = posn.copy();
     this.posn = firstPosn.copy();
     this.c = c;
   }
-  Enemy(PVector posn, color c,SoundFile attack) {
+  Enemy(PVector posn, color c, SoundFile attackSound) {
     firstPosn = posn.copy();
     this.posn = firstPosn.copy();
     this.c = c;
-    attackSound = attack;
+    this.attackSound = attackSound;
   }
-  
-  void reset(){
-  posn = firstPosn;
-  size = new PVector(50, 50, 100);
-  rotation = 0;
-  baseSpeed = 3;
-  speedDuringAttack = baseSpeed*3;
-  speed = baseSpeed;
-  attackingRange = 300;
-  currentTime=0;
-  initialTimeReadying=0;
-  initialTimeAttacking=0;
-  attackWindUp = 500;
-  attackDuration = 200;
-  attackCooldown = 500;
-  damage = 15;
-  hp = 50;
-  initialSpawnTime = 0;
-  timeToSpawn = 2000;
-  hitDist = 200;
-  isAttacking = false;
-  isDead = true;
-  isReadyingAttack = false;
-  isSpawning = false;
-  isShooter = false;
-  projectiles = new ArrayList<>();
+  Enemy(PVector posn, color c, SoundFile attackSound, PShape[] walk) {
+    firstPosn = posn.copy();
+    this.posn = firstPosn.copy();
+    this.c = c;
+    this.attackSound = attackSound;
+    this.walk = walk;
+    isWalkAnimated = true;
+  }
+  Enemy(PVector posn, color c, SoundFile attackSound, PShape[] walk, PShape[] attackAnim) {
+    firstPosn = posn.copy();
+    this.posn = firstPosn.copy();
+    this.c = c;
+    this.attackSound = attackSound;
+    this.walk = walk;
+    isWalkAnimated = true;
+    this.attack = attackAnim;
+    isAttackAnimated = true;
+  }
+
+  Enemy(PVector posn, color c, SoundFile attackSound, PShape[] walk, PShape[] windup, PShape[] attackAnim) {
+    firstPosn = posn.copy();
+    this.posn = firstPosn.copy();
+    this.c = c;
+    this.attackSound = attackSound;
+    this.walk = walk;
+    isWalkAnimated = true;
+    this.windup = windup;
+    isWindupAnimated = true;
+    this.attack = attackAnim;
+    isAttackAnimated = true;
+  }
+
+  void reset() {
+    posn = firstPosn;
+    size = new PVector(50, 50, 100);
+    rotation = 0;
+    baseSpeed = 3;
+    speedDuringAttack = baseSpeed*3;
+    speed = baseSpeed;
+    attackingRange = 300;
+    currentTime=0;
+    initialTimeReadying=0;
+    initialTimeAttacking=0;
+    attackWindUp = 500;
+    attackDuration = 200;
+    attackCooldown = 500;
+    damage = 15;
+    hp = 50;
+    initialSpawnTime = 0;
+    timeToSpawn = 2000;
+    hitDist = 200;
+    isAttacking = false;
+    isDead = true;
+    isReadyingAttack = false;
+    isSpawning = false;
+    isShooter = false;
+    projectiles = new ArrayList<>();
   }
 
   void lookAtPlayer(Player p) {
@@ -57,6 +91,7 @@ class Enemy implements Renderable {
   }
 
   void render() {
+    isAnimated = (isWalkAnimated || isAttackAnimated || isWindupAnimated);
     currentTime = millis();
     if (!isDead) {
       pushMatrix();
@@ -70,8 +105,12 @@ class Enemy implements Renderable {
 
       translate(posn.x, posn.y, posn.z);
       rotateY(rotation);
-      scale(2);
-      box(size.x, size.y, size.z);
+      if (!isAnimated) {
+        scale(2);
+        box(size.x, size.y, size.z);
+      } else {
+        renderFrame();
+      }
       popMatrix();
       isDead = (hp <= 0);
     } else if (isSpawning) {
@@ -84,6 +123,19 @@ class Enemy implements Renderable {
         isDead = false;
         isSpawning = false;
       }
+    }
+  }
+
+  void renderFrame() {
+    if (isAttackAnimated && isAttacking) {
+      shape(attack[attackFrame]);
+      attackFrame = (attackFrame+1)%walk.length;
+    }else if(isWindupAnimated && isReadyingAttack){
+      shape(windup[windupFrame]);
+      windupFrame = (windupFrame+1)%walk.length;
+    }else{
+        shape(walk[walkFrame]);
+        walkFrame = (walkFrame+1)%walk.length;
     }
   }
 
