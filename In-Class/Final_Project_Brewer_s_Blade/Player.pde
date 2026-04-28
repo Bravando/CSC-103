@@ -20,6 +20,7 @@ class Player {
     hitBuffer = 500,
     timeBetweenAttacks = 200,
     damage = 10;
+  SoundFile attack, hit;
 
 
   Player() {
@@ -28,6 +29,23 @@ class Player {
     velX = new PVector(0, 0);
     velZ = new PVector(0, 0);
     topSpeed = 7;
+  }
+  Player(SoundFile attackSound) {
+    posn = new PVector(width/2.0, height/2.0, (height/2.0) / tan(PI*30.0 / 180.0));
+    dir = new PVector(width/2.0, height/2.0, 0);
+    velX = new PVector(0, 0);
+    velZ = new PVector(0, 0);
+    topSpeed = 7;
+    attack = attackSound;
+  }
+  Player(SoundFile attackSound, SoundFile hitSound) {
+    posn = new PVector(width/2.0, height/2.0, (height/2.0) / tan(PI*30.0 / 180.0));
+    dir = new PVector(width/2.0, height/2.0, 0);
+    velX = new PVector(0, 0);
+    velZ = new PVector(0, 0);
+    topSpeed = 7;
+    attack = attackSound;
+    hit = hitSound;
   }
 
   void makeCam() {
@@ -142,47 +160,53 @@ class Player {
       println(hp);
     }
   }
-  void attackedBy(ArrayList<Enemy> es){
-   for(int i = 0;i<es.size();i++){
-    attackedBy(es.get(i)); 
-   }
+  void attackedBy(ArrayList<Enemy> es) {
+    for (int i = 0; i<es.size(); i++) {
+      attackedBy(es.get(i));
+    }
   }
   void attack(Enemy e) {
     currentTime = millis();
-      if (currentTime > initialTimeAttack+timeBetweenAttacks) {
+    if (currentTime > initialTimeAttack+timeBetweenAttacks) {
       initialTimeAttack = millis();
-      
+
       //println("attack!");
-      
+
       if (dist(e.posn.x, e.posn.z, dir.x, dir.z)<hitRadius) {
         e.hp -= damage;
-        // !!! Play feedback
-        println("Hit!");
-        print("  " + e.hp);
+        if (!(hit == null)) {
+          hit.play();
+        }
+        //println("Hit!");
+        //print("  " + e.hp);
+      } else {
+        if (!(attack == null)) {
+          attack.play();
+        }
       }
     }
   }
-  void attack(ArrayList<Enemy> es){
-    for(int i = 0;i<es.size();i++){
-    attack(es.get(i)); 
-   }
+  void attack(ArrayList<Enemy> es) {
+    for (int i = 0; i<es.size(); i++) {
+      attack(es.get(i));
+    }
   }
-  void healthBar(){
-    hp = constrain(hp,0,maxHp);
-   pushMatrix();
-   hint(DISABLE_DEPTH_TEST);
-   camera();
-   
-   rectMode(CORNER);
-   noStroke();
-   
-   float wid = width/3,hgt = height/20,widsFromRight = 0.25,hgtsFromBottom = 2;
-   fill(200,0,0);
-   rect(width-(wid*(1 + widsFromRight)),height-(hgt*hgtsFromBottom),wid,hgt);
-   fill(100,255,5);
-   rect(width-(wid*(1 + widsFromRight)),height-(hgt*hgtsFromBottom),wid*map(maxHp-hp,100,0,0,1),hgt);
-   
-   hint(ENABLE_DEPTH_TEST);
-   popMatrix();
+  void healthBar() {
+    hp = constrain(hp, 0, maxHp);
+    pushMatrix();
+    hint(DISABLE_DEPTH_TEST);
+    camera();
+
+    rectMode(CORNER);
+    noStroke();
+
+    float wid = width/3, hgt = height/20, widsFromRight = 0.25, hgtsFromBottom = 2;
+    fill(200, 0, 0);
+    rect(width-(wid*(1 + widsFromRight)), height-(hgt*hgtsFromBottom), wid, hgt);
+    fill(100, 255, 5);
+    rect(width-(wid*(1 + widsFromRight)), height-(hgt*hgtsFromBottom), wid*map(maxHp-hp, 100, 0, 0, 1), hgt);
+
+    hint(ENABLE_DEPTH_TEST);
+    popMatrix();
   }
 }

@@ -1,6 +1,6 @@
 class Enemy implements Renderable {
   PVector posn, firstPosn, size = new PVector(50, 50, 100);
-  float rotation = 0, baseSpeed = 3, speedDuringAttack = baseSpeed*3, speed = baseSpeed, attackingRange = 300;
+  float rotation = 0, baseSpeed = 3, speedDuringAttack = baseSpeed*3, speed = baseSpeed, attackingRange = 300, scale = 20;
   int currentTime, initialTimeReadying, initialTimeAttacking, attackWindUp = 500, attackDuration = 200,
     attackCooldown = 500, damage = 15, hp = 50, initialSpawnTime, timeToSpawn = 2000, hitDist = 200, walkFrame = 0,
     attackFrame = 0, windupFrame = 0;
@@ -103,7 +103,7 @@ class Enemy implements Renderable {
         fill(c);
       }
 
-      translate(posn.x, posn.y, posn.z);
+      translate(posn.x, posn.y+75, posn.z);
       rotateY(rotation);
       if (!isAnimated) {
         scale(2);
@@ -127,15 +127,19 @@ class Enemy implements Renderable {
   }
 
   void renderFrame() {
+    rotateY(PI);
+    scale(-scale);
     if (isAttackAnimated && isAttacking) {
       shape(attack[attackFrame]);
-      attackFrame = (attackFrame+1)%walk.length;
-    }else if(isWindupAnimated && isReadyingAttack){
+      attackFrame = floor(constrain(map(initialTimeAttacking+attackDuration-currentTime,0,attackDuration,0,attack.length-0.01),0,attack.length-1));
+    } else if (isWindupAnimated && isReadyingAttack) {
       shape(windup[windupFrame]);
-      windupFrame = (windupFrame+1)%walk.length;
-    }else{
-        shape(walk[walkFrame]);
+      windupFrame = floor(constrain(map(initialTimeReadying+attackWindUp-currentTime,0,attackWindUp,0,windup.length-0.01),0,windup.length-1));
+    } else {
+      shape(walk[walkFrame]);
+      if (!isAttacking) {
         walkFrame = (walkFrame+1)%walk.length;
+      }
     }
   }
 
