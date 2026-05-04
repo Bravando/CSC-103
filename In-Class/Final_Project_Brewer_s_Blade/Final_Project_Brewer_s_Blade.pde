@@ -3,10 +3,10 @@ import processing.sound.*;
 GLWindow cursorControls;
 
 Player character;
-Enemy wolf1,wolf1Base, wolf2,wolf2Base, wolf3,wolf3Base, wolf4,wolf4Base, bearBoss;
+Enemy wolf1, wolf1Base, wolf2, wolf2Base, wolf3, wolf3Base, wolf4, wolf4Base, bearBoss;
 //Shooter deer1, deer2, deer3;
 PVector wolf1Start = new PVector(-835, 300, -855), wolf2Start = new PVector(-835, 300, 300),
-        wolf3Start = new PVector(300, 300, -855), wolf4Start = new PVector(300, 300, 300);
+  wolf3Start = new PVector(300, 300, -855), wolf4Start = new PVector(300, 300, 300);
 ArrayList<Enemy> enemies;
 ArrayList<Projectile> projectiles = new ArrayList<>();
 PShape[] wolfAnim, bearWalk, bearWindup, bearAttackAnim;
@@ -17,7 +17,7 @@ PImage swordTexture;
 color wolfC, deerC, bearC;
 
 int currentState = 0;
-boolean canPointerEscape = false;
+boolean canPointerEscape = false, isResetting = false;
 PGraphics end;
 SoundFile wolfAttack, bgMusic, bearAttack, swordSwing, swordHit;
 
@@ -26,24 +26,24 @@ void setup() {
   size(800, 500, P3D);
   smooth(0);
   cursorControls = (GLWindow) surface.getNative();
-  if(!canPointerEscape){
-  cursorControls.setPointerVisible(false);
-  cursorControls.confinePointer(true);
-  cursorControls.warpPointer(width, height);
+  if (!canPointerEscape) {
+    cursorControls.setPointerVisible(false);
+    cursorControls.confinePointer(true);
+    cursorControls.warpPointer(width, height);
   }
   wolfAttack = new SoundFile(this, "Wolf Growl 4 10 26.mp3");
   bgMusic = new SoundFile(this, "deuslower-medieval-ambient-236809.mp3");
   bearAttack = new SoundFile(this, "bear growl 4 27 26.mp3");
   swordSwing = new SoundFile(this, "sword swing.mp3");
   swordHit = new SoundFile(this, "sword slash.mp3");
-  wolfAnim = load3DAnimation(25,"low_poly_wolf_animated","obj");
-  bearWalk = load3DAnimation(40,"low_poly_bear_walk","obj");
-  bearWindup = load3DAnimation(10,"low_poly_bear_windup","obj");
-  bearAttackAnim = load3DAnimation(16,"low_poly_bear_attack","obj");
+  wolfAnim = load3DAnimation(25, "low_poly_wolf_animated", "obj");
+  bearWalk = load3DAnimation(40, "low_poly_bear_walk", "obj");
+  bearWindup = load3DAnimation(10, "low_poly_bear_windup", "obj");
+  bearAttackAnim = load3DAnimation(16, "low_poly_bear_attack", "obj");
   wolfC = color(100, 100, 120);
   deerC = color(126, 37, 191);
   bearC = color(152, 120, 55);
-  character = new Player(swordSwing,swordHit);
+  character = new Player(swordSwing, swordHit);
   wolf1 = new Enemy(wolf1Start, wolfC, wolfAttack, wolfAnim);
   wolf1Base = wolf1;
   wolf2 = new Enemy(wolf2Start, wolfC, wolfAttack, wolfAnim);
@@ -70,25 +70,7 @@ void setup() {
   for (int i = 0; i<waves.length; i++) {
     waves[i] =  new ArrayList<Enemy>();
   }
-  waves[0].add(wolf1());
-  waves[1].add(wolf2());
-  waves[1].add(wolf3());
-  //waves[1].add(deer1);
-  waves[2].add(wolf1());
-  waves[2].add(wolf2());
-  waves[2].add(wolf3());
-  //waves[2].add(deer3);
-  waves[3].add(wolf1());
-  waves[3].add(wolf2());
-  waves[3].add(wolf3());
-  waves[3].add(wolf4());
-  //waves[3].add(deer1);
-  //waves[3].add(deer3);
-  waves[4].add(bearBoss);
-  waves[4].add(wolf2);
-  waves[4].add(wolf3);
-  //waves[4].add(deer2);
-  //waves[4].add(deer3);
+  setWaves();
 }
 
 void draw() {
@@ -124,8 +106,8 @@ void draw() {
   //noStroke();
 
   makeRoom();
-  if(!canPointerEscape){
-  cursorControls.warpPointer(width, height);
+  if (!canPointerEscape) {
+    cursorControls.warpPointer(width, height);
   }
   character.makeCam();
   character.posn.x = constrain(character.posn.x, -950, 500);
@@ -134,6 +116,7 @@ void draw() {
   switch(currentState) {
   case 0:
     startScreen();
+    resetAll();
     break;
   case 1:
   case 2:
@@ -198,10 +181,19 @@ void keyPressed() {
     if (key == 'k') {
       //enemies = new ArrayList<Enemy>();  // For Testing
       for (int i = 0; i<enemies.size(); i++) {
-      enemies.get(i).hp = 0;
+        enemies.get(i).hp = 0;
+      }
     }
+    if (key == 'e'){
+    character.attack(enemies); 
     }
 
+  case 6:
+  case 7:
+  if(key == 'r'){
+    isResetting = true;
+    currentState = 0;
+  }
     break;
   }
 }
@@ -350,32 +342,51 @@ void makeRoom() {
   squareWall(-1050, 0, 600, 8, 34, color(100, 200, 200), false); // FrontLeftWall (Front Walls are behind camera at spawn)
   squareWall(600, 0, -1050, 8, 34, color(200, 200, 100), true); // FrontRightWall
 }
-void resetWolves(){
- wolf1.reset();
- //wolf1Start = new PVector(-835, 300, -855);
- //wolf1.posn = wolf1Start;
- wolf2.reset();
- //wolf2Start = new PVector(-835, 300, 300);
- //wolf2.posn = wolf2Start;
- wolf3.reset();
- //wolf3Start = new PVector(300, 300, -855);
- //wolf3.posn = wolf3Start;
- wolf4.reset();
- //wolf4Start = new PVector(300, 300, 300);
- //wolf4.posn = wolf4Start;
+void resetWolves() {
+  wolf1.reset();
+  //wolf1Start = new PVector(-835, 300, -855);
+  //wolf1.posn = wolf1Start;
+  wolf2.reset();
+  //wolf2Start = new PVector(-835, 300, 300);
+  //wolf2.posn = wolf2Start;
+  wolf3.reset();
+  //wolf3Start = new PVector(300, 300, -855);
+  //wolf3.posn = wolf3Start;
+  wolf4.reset();
+  //wolf4Start = new PVector(300, 300, 300);
+  //wolf4.posn = wolf4Start;
+  bearBoss.reset();
+  bearBoss.hp = 300;
+  bearBoss.damage = 30;
+  bearBoss.attackWindUp *= 2;
+  bearBoss.attackDuration *= 2.5;
+  bearBoss.size = new PVector(100, 100, 200);
+  bearBoss.attackingRange = 500;
+  bearBoss.scale = 50;
 }
 
-Enemy wolf1(){
+Enemy wolf1() {
   return new Enemy(wolf1Start, wolfC, wolfAttack, wolfAnim);
 }
-Enemy wolf2(){
+Enemy wolf2() {
   return new Enemy(wolf2Start, wolfC, wolfAttack, wolfAnim);
 }
-Enemy wolf3(){
+Enemy wolf3() {
   return new Enemy(wolf3Start, wolfC, wolfAttack, wolfAnim);
 }
-Enemy wolf4(){
+Enemy wolf4() {
   return new Enemy(wolf4Start, wolfC, wolfAttack, wolfAnim);
+}
+Enemy bearBoss() {
+  bearBoss = new Enemy(new PVector(-835, 300, -855), bearC, bearAttack, bearWalk, bearWindup, bearAttackAnim);
+  bearBoss.hp = 300;
+  bearBoss.damage = 30;
+  bearBoss.attackWindUp *= 2;
+  bearBoss.attackDuration *= 2.5;
+  bearBoss.size = new PVector(100, 100, 200);
+  bearBoss.attackingRange = 500;
+  bearBoss.scale = 50;
+  return bearBoss;
 }
 
 PImage[] loadAnimation(Integer frames, String fileName, String extension) {
@@ -392,4 +403,37 @@ PShape[] load3DAnimation(Integer frames, String fileName, String extension) {
     animationFrames[i] = loadShape(fileName + i + "." + extension);
   }
   return animationFrames;
+}
+void setWaves() {
+  waves[0].add(wolf1());
+  waves[1].add(wolf2());
+  waves[1].add(wolf3());
+  //waves[1].add(deer1);
+  waves[2].add(wolf1());
+  waves[2].add(wolf2());
+  waves[2].add(wolf3());
+  //waves[2].add(deer3);
+  waves[3].add(wolf1());
+  waves[3].add(wolf2());
+  waves[3].add(wolf3());
+  waves[3].add(wolf4());
+  //waves[3].add(deer1);
+  //waves[3].add(deer3);
+  waves[4].add(bearBoss());
+  waves[4].add(wolf2);
+  waves[4].add(wolf3);
+  //waves[4].add(deer2);
+  //waves[4].add(deer3);
+}
+void resetAll(){
+ if(isResetting){
+   for (int i = 0; i<enemies.size(); i++) {
+        enemies.get(i).hp = 0;
+      }
+   resetWolves();
+   setWaves();
+   character = new Player(swordSwing, swordHit);
+   stick = new Weapon(character, new PVector(25, 200, 50)/*sword, swordTexture*/);
+   isResetting = false;
+ }
 }
